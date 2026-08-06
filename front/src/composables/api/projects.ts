@@ -9,13 +9,16 @@ import {
 export const getProjects = async (fallback: Project[]): Promise<Project[]> => {
   if (!isRemoteActive()) return fallback;
   try {
-    const res = await monitoredFetch(`${backendUrl.value}/projects`, {
+    const res = await monitoredFetch(`${backendUrl.value}/projects?per_page=100`, {
       headers: getAuthHeaders({ 'Accept': 'application/json' })
     });
 
     if (res.ok) {
       const data = await res.json();
       const rawList = Array.isArray(data) ? data : (data.data || []);
+      if (!rawList || rawList.length === 0) {
+        return fallback;
+      }
       return rawList.map((p: any) => {
         return {
           ...p,

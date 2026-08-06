@@ -14,10 +14,10 @@ import DashboardSection from './components/sections/DashboardSection.vue';
 
 // --- ESTADOS REACTIVOS PRINCIPALES ---
 const currentTab = ref<'home' | 'blog' | 'dashboard' | 'contact'>('home');
-const posts = ref<Post[]>([]);
-const messages = ref<Message[]>([]);
-const certifications = ref<Certification[]>([]);
-const projects = ref<Project[]>([]);
+const posts = ref<Post[]>(DEFAULT_POSTS);
+const messages = ref<Message[]>(DEFAULT_MESSAGES);
+const certifications = ref<Certification[]>(DEFAULT_CERTIFICATIONS);
+const projects = ref<Project[]>(DEFAULT_PROJECTS);
 
 const {
   checkConnection,

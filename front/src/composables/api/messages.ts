@@ -16,6 +16,9 @@ export const getMessages = async (fallback: Message[]): Promise<Message[]> => {
     if (res.ok) {
       const data = await res.json();
       const rawList = Array.isArray(data) ? data : (data.data || []);
+      if (!rawList || rawList.length === 0) {
+        return fallback;
+      }
       return rawList.map((m: any) => {
         // Formatear fecha de created_at si viene de Laravel (ej: 2026-07-26T10:15:30.000000Z -> 2026-07-26)
         let formattedDate = m.date || m.created_at || new Date().toISOString().split('T')[0];

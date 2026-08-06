@@ -9,13 +9,16 @@ import {
 export const getPosts = async (fallback: Post[]): Promise<Post[]> => {
   if (!isRemoteActive()) return fallback;
   try {
-    const res = await monitoredFetch(`${backendUrl.value}/publications`, {
+    const res = await monitoredFetch(`${backendUrl.value}/publications?per_page=100`, {
       headers: getAuthHeaders({ 'Accept': 'application/json' })
     });
 
     if (res.ok) {
       const data = await res.json();
       const rawList = Array.isArray(data) ? data : (data.data || []);
+      if (!rawList || rawList.length === 0) {
+        return fallback;
+      }
       return rawList.map((p: any) => {
         const title_en = p.title_en || p.title || '';
         const summary_en = p.summary_en || p.summary || '';

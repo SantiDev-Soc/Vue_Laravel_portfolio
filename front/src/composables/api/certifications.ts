@@ -9,12 +9,15 @@ import {
 export const getCertifications = async (fallback: Certification[]): Promise<Certification[]> => {
   if (!isRemoteActive()) return fallback;
   try {
-    const res = await monitoredFetch(`${backendUrl.value}/certifications`, {
+    const res = await monitoredFetch(`${backendUrl.value}/certifications?per_page=100`, {
       headers: getAuthHeaders({ 'Accept': 'application/json' })
     });
     if (res.ok) {
       const data = await res.json();
       const rawList = Array.isArray(data) ? data : (data.data || []);
+      if (!rawList || rawList.length === 0) {
+        return fallback;
+      }
       return rawList.map((c: any) => {
         const title_en = c.title_en || c.title || '';
         const description_en = c.description_en || c.description || '';
