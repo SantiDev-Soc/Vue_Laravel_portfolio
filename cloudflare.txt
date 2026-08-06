@@ -1,0 +1,122 @@
+🚀 Despliegue de Portfolio Fullstack: Docker + Cloudflare Tunnels
+
+Este documento detalla el proceso de configuración, los obstáculos encontrados y las soluciones implementadas para desplegar
+una arquitectura Fullstack (Vue 3/Vite 6, Laravel 11, PostgreSQL) de forma local pero accesible globalmente mediante Cloudflare Tunnels.
+🏗️ Arquitectura del Sistema
+
+    Frontend: Vue 3 + Vite 6 (Puerto 3000)
+
+    Backend: Laravel 11 API (Puerto 8000)
+
+    Base de Datos: PostgreSQL 16
+
+    Gateway: Cloudflare Tunnel (Protocolo HTTP2)
+
+    Dominio: santtech.uk y api.santtech.uk
+
+🛠️ Paso a Paso del Despliegue
+1. Dockerización
+
+Se configuró un entorno multi-contenedor usando Docker Compose. Se definió una red privada (santi-portfolio-network) para
+que los servicios pudieran comunicarse entre sí mediante nombres de host internos en lugar de IPs.
+2. Configuración del Túnel de Cloudflare
+
+En lugar de abrir puertos en el router (Port Forwarding), se instaló un conector de Cloudflare en un contenedor. Este crea
+un túnel seguro que expone los servicios internos a la red de Cloudflare.
+3. Orquestación de Hostnames
+
+Se utilizó el panel de Cloudflare Zero Trust para mapear:
+
+    El tráfico de santtech.uk al contenedor frontend:3000.
+
+    El tráfico de api.santtech.uk al contenedor backend:8000.
+
+🚧 Registro de Errores y Soluciones
+
+Durante el proceso, "derribamos varios muros" técnicos. Aquí el desglose:
+❌ Error 1: 404 / Dirección no encontrada en el navegador
+
+    Causa: Los registros DNS CNAME de Cloudflare no apuntaban correctamente al destino del túnel.
+
+    Solución: Se configuraron los registros CNAME apuntando a [TUNNEL_ID].cfargotunnel.com con el Proxy (nube naranja) activado.
+
+❌ Error 2: "Blocked request" (Vite 6)
+
+    Causa: Vite 6 incluye una nueva medida de seguridad que bloquea peticiones si el host no está explícitamente permitido.
+
+    Solución: Se modificó vite.config.ts añadiendo la propiedad server.allowedHosts: true (o especificando los dominios).
+
+❌ Error 3: Timeout / Caídas constantes del Túnel
+
+    Causa: El túnel intentaba usar el protocolo QUIC (UDP), que es inestable en muchas conexiones domésticas.
+
+    Solución: Se forzó el túnel a usar HTTP2 (TCP) mediante el comando --protocol http2 en el Docker Compose.
+
+❌ Error 4: 503 Service Unavailable
+
+    Causa: Hubo múltiples razones: desincronización de reglas del panel de Cloudflare y el modo SSL configurado en "Flexible".
+
+    Solución:
+
+        Se cambió el modo SSL a "Full" en el panel principal de Cloudflare.
+
+        Se implementó un archivo config.yml local para definir las reglas de entrada (Ingress Rules) manualmente, garantizando
+        que el túnel siempre supiera a dónde dirigir el tráfico.
+
+❌ Error 5: Refresco infinito de la página (Bucle de HMR)
+
+    Causa: El sistema de "Hot Module Replacement" de Vite intentaba conectar por WebSockets a una dirección interna inaccesible
+    desde el exterior.
+
+    Solución: Se configuró la sección server.hmr en Vite indicando el host público y el protocolo wss. Además, se activó
+    usePolling: true para estabilizar la detección de cambios en volúmenes Docker.
+
+📄 Configuración Final de Referencia
+1. docker-compose.yml (Fragmento del Túnel)
+code Yaml
+
+tunnel:
+  image: cloudflare/cloudflared:latest
+  container_name: cloudflared-tunnel
+  restart: always
+  command: tunnel --config /etc/cloudflared/config.yml run
+  env_file:
+    - ./environment/cloudflare.env
+  volumes:
+    - ./environment/config.yml:/etc/cloudflared/config.yml
+  networks:
+    - portfolio-network
+
+2. environment/config.yml (Reglas de Tráfico)
+code Yaml
+
+tunnel: 745dd756-5c1e-49fc-95b4-c703807d774c
+ingress:
+  - hostname: api.santtech.uk
+    service: http://santi-portfolio-backend:8000
+  - hostname: santtech.uk
+    service: http://santi-portfolio-frontend:3000
+  - service: http_status:404
+
+3. front/vite.config.ts (Estabilización del Frontend)
+code TypeScript
+
+server: {
+  host: '0.0.0.0',
+  port: 3000,
+  allowedHosts: true,
+  hmr: {
+    host: 'santtech.uk',
+    protocol: 'wss',
+    clientPort: 443,
+  },
+  watch: {
+    usePolling: true,
+  }
+}
+
+✅ Resultado Final
+
+El sistema es ahora completamente funcional. El portfolio es accesible a través de HTTPS en todo el mundo, con una separación clara entre la API y el Frontend, y una seguridad robusta al no exponer puertos físicos del servidor local.
+
+Desplegado con éxito por: R. Santiago Velázquez.

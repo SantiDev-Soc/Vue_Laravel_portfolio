@@ -1,0 +1,81 @@
+services:
+  # --- PERSISTENCIA ---
+  db:
+    image: postgres:16-alpine
+    container_name: santi-portfolio-db
+    restart: always
+    environment:
+      - POSTGRES_USER=santi_admin
+      - POSTGRES_PASSWORD=santi_secure_pass
+      - POSTGRES_DB=portfolio_db
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U santi_admin" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - portfolio-network
+
+  # --- FRONTEND (VUE 3) ---
+  frontend:
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+    container_name: santi-portfolio-frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./front:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - VITE_API_URL=https://api.santtech.uk/api
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - portfolio-network
+
+  # --- BACKEND API (LARAVEL 11) ---
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: santi-portfolio-backend
+    tty: true
+    stdin_open: true
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend:/app
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - portfolio-network
+
+  # --- CLOUDFLARE TUNNEL ---
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared-tunnel
+    restart: always
+    # CAMBIO: Le decimos que use el archivo de config
+    command: tunnel --config /etc/cloudflared/config.yml run
+    env_file:
+      - ./environment/cloudflare.env
+    volumes:
+      - ./environment/config.yml:/etc/cloudflared/config.yml
+    networks:
+      - portfolio-network
+
+volumes:
+  postgres_data:
+
+networks:
+  portfolio-network:
+    name: santi-portfolio-network # Nombre fijo para evitar prefijos de carpeta
+    driver: bridge

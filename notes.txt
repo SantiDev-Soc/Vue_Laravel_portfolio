@@ -1,0 +1,27 @@
+<?php
+declare(strict_types=1);
+
+use App\Http\Controllers\CertificationController;
+use App\Http\Controllers\HealtController;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\ContactController;
+
+
+// Ruta de verificación de estado
+Route::get('/health', [HealtController::class, 'check']);
+
+// Project routes
+Route::post('/projects/create', [ProjectController::class, 'create']);
+Route::put('/projects/update/{id}', [ProjectController::class, 'update']);
+Route::delete('/projects/delete/{id}', [ProjectController::class, 'delete']);
+
+// Contact routes
+Route::post('/contacts/create', [ContactController::class, 'create']);
+Route::put('/contacts/update/{id}', [ContactController::class, 'update']);
+Route::delete('/contacts/delete/{id}', [ContactController::class, 'delete']);
+
+// Certification routes
+Route::post('/certification/create', [CertificationController::class, 'create']);
+Route::put('/certification/update/{id}', [CertificationController::class, 'update']);
+Route::delete('/certification/delete/{id}', [CertificationController::class, 'delete']);

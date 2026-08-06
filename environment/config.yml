@@ -1,0 +1,8 @@
+# ./environment/config.yml
+tunnel: 745dd756-5c1e-49fc-95b4-c703807d774c
+ingress:
+  - hostname: santtech.uk
+    service: http://santi-portfolio-frontend:3000
+  - hostname: api.santtech.uk
+    service: http://santi-portfolio-backend:8000
+  - service: http_status:404

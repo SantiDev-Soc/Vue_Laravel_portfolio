@@ -1,0 +1,6 @@
+{
+  "name": "Portfolio Desarrollador Fullstack",
+  "description": "Portafolio desarrollador backend fullstack con Vue 3 y dashboard autogestionado de publicaciones técnicas.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
