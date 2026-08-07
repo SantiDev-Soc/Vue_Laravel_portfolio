@@ -41,7 +41,7 @@ const { t } = useI18n();
         </a>
         <a href="tel:+34691318563" class="inline-flex items-center space-x-2 px-4 py-2.5 rounded-lg bg-[#1A1E26] hover:bg-[#252B38] text-slate-300 border border-white/5 transition-colors text-sm">
           <Phone class="h-4 w-4 text-emerald-400" />
-          <span>+34 691 31 85 63</span>
+          <span>+31 644 70 85 30</span>
         </a>
       </div>
 
@@ -77,6 +77,7 @@ const { t } = useI18n();
           <p><span class="text-indigo-400">class</span> <span class="text-emerald-400">BackendDeveloper</span> {</p>
           <p class="pl-4"><span class="text-indigo-400">public</span> <span class="text-teal-400">array</span> <span class="text-amber-400">$focus</span> = [</p>
           <p class="pl-8"><span class="text-emerald-500">'Domain_Driven_Design'</span>,</p>
+          <p class="pl-8"><span class="text-emerald-500">'Event_Drive'</span>,</p>
           <p class="pl-8"><span class="text-emerald-500">'CQRS_Architecture'</span>,</p>
           <p class="pl-8"><span class="text-emerald-500">'Database_Performance'</span></p>
           <p class="pl-4">];</p>
