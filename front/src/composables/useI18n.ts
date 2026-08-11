@@ -13,8 +13,8 @@ const autoDetectLocale = (): Locale => {
 
   // Detectar por idioma del navegador
   const browserLang = navigator.language || (navigator as any).userLanguage || 'en';
-  const isSpanishSpeaker = ['es', 'ca', 'gl', 'eu', 'ast'].some(lang => 
-    browserLang.toLowerCase().startsWith(lang)
+  const isSpanishSpeaker = ['es', 'ca', 'gl', 'eu', 'ast'].some(lang =>
+      browserLang.toLowerCase().startsWith(lang)
   );
 
   // Detectar por zona horaria de España o Latinoamérica
@@ -22,12 +22,12 @@ const autoDetectLocale = (): Locale => {
   try {
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
     if (tz && (
-      tz.includes('Europe/Madrid') || 
-      (tz.includes('America/') && ![
-        'America/New_York', 'America/Los_Angeles', 'America/Chicago', 
-        'America/Denver', 'America/Anchorage', 'America/Phoenix', 
-        'America/Halifax', 'America/Toronto', 'America/Vancouver'
-      ].some(ignoredTz => tz.includes(ignoredTz)))
+        tz.includes('Europe/Madrid') ||
+        (tz.includes('America/') && ![
+          'America/New_York', 'America/Los_Angeles', 'America/Chicago',
+          'America/Denver', 'America/Anchorage', 'America/Phoenix',
+          'America/Halifax', 'America/Toronto', 'America/Vancouver'
+        ].some(ignoredTz => tz.includes(ignoredTz)))
     )) {
       isSpanishZone = true;
     }
@@ -79,7 +79,26 @@ const translations: Record<Locale, Record<string, any>> = {
       ide_return: "'Sistemas altamente desacoplados'",
       ide_focus_title: '💡 ENFOQUE TÉCNICO',
       ide_focus_text: 'Especializado en aislar lógica empresarial (Dominio) de capas externas. Implementación de bus de mensajes robusto para Command / Query de forma limpia.',
-      
+
+      // Card de Presentación
+      card: {
+        status_badge: 'ARCH_PROFILE_V1.0',
+        available_title: 'Disponible para trabajar',
+        status_tag: 'OPEN TO WORK & FREELANCE',
+        name: 'Santiago Velázquez',
+        role: 'Backend & Solution Architect',
+        location: 'Países Bajos / Netherlands',
+        arch_label: 'Arquitectura',
+        arch_value: 'DDD, CQRS & Event-Driven',
+        backend_label: 'Backend Stack',
+        backend_value: 'Laravel 11 & PHP 8.4',
+        containers_label: 'Contenedores',
+        containers_value: 'Docker Monorepo',
+        frontend_label: 'Frontend',
+        frontend_value: 'Vue 3 & TypeScript',
+        summary: 'Especializado en diseñar APIs de alto rendimiento, aislar la lógica de dominio (DDD/CQRS), orquestar arquitecturas orientadas a eventos (Event-Driven) y optimizar bases de datos PostgreSQL con cachés Redis.'
+      },
+
       // Experiencia
       experience_title: 'Trayectoria Técnica',
       experience_subtitle: 'Experiencia real construyendo e integrando flujos de datos estructurados.',
@@ -87,12 +106,12 @@ const translations: Record<Locale, Record<string, any>> = {
       timeline_role: 'Desarrollador Backend en Prácticas',
       timeline_company: 'en',
       timeline_desc: 'Durante este periodo de prácticas de un año, desarrollé y consolidé gran parte de mis aptitudes técnicas en backend. Participé activamente en la implementación de arquitectura backend aplicando principios de Domain-Driven Design (DDD) y CQRS para asegurar un código altamente mantenible, además de colaborar en el diseño y desarrollo de una API REST segura y Pasarela de Pagos SaaS integrada con la API de Stripe con control de concurrencia y rate-limiting. Colaboré en la creación de Command/Query Handlers, propagación de Eventos de dominio, diseño de DTOs independientes y desacoplamiento de Repositorios. Aseguré la calidad de código mediante tests unitarios con PHPUnit y validación de APIs con Postman.',
-      
+
       // Proyectos
       projects_label: 'PORTAFOLIO DE SISTEMAS',
       projects_title: 'Proyectos Destacados',
       projects_subtitle: 'Sistemas distribuidos e infraestructuras de backend que he conceptualizado y estructurado.',
-      
+
       project_santi_solutions: {
         title: 'Santi Solutions',
         desc: 'Plataforma de consultoría y reformas premium para Florida, USA. Diseñado bajo Arquitectura Hexagonal y DDD (Domain-Driven Design). Orquestado con un monorepo Docker de 12 contenedores, incluyendo 6 servicios web Laravel 11/PHP 8.4, 5 workers asíncronos para comunicación basada en eventos mediante Redis Pub/Sub, y un pool de 6 bases de datos PostgreSQL aisladas.',
@@ -147,7 +166,7 @@ const translations: Record<Locale, Record<string, any>> = {
       channel: 'Canal Principal',
       phone: 'Móvil / WhatsApp',
       location: 'Ubicación',
-      location_text: 'Madrid, España (Disponible para remoto)',
+      location_text: 'Países Bajos / Netherlands',
       form_title: 'FORMULARIO_SEGURO_API.JSON',
       form_name: 'Tu Nombre',
       form_email: 'Tu Correo Electrónico',
@@ -180,7 +199,7 @@ const translations: Record<Locale, Record<string, any>> = {
       inbox_select_prompt: 'Selecciona un mensaje del buzón para auditar su contenido.',
       confirm_delete_post: '¿Estás seguro de que deseas eliminar esta publicación técnica?',
       confirm_delete_msg: '¿Deseas borrar este mensaje del buzón?',
-      
+
       // Modal Post
       modal_post_new: 'Crear Publicación Técnica',
       modal_post_edit: 'Editar Publicación Técnica',
@@ -220,7 +239,26 @@ const translations: Record<Locale, Record<string, any>> = {
       ide_return: "'Highly decoupled systems'",
       ide_focus_title: '💡 TECHNICAL FOCUS',
       ide_focus_text: 'Specialized in isolating business logic (Domain) from external layers. Implementation of a robust message bus for clean Command / Query execution.',
-      
+
+      // Card de Presentación
+      card: {
+        status_badge: 'ARCH_PROFILE_V1.0',
+        available_title: 'Available for work',
+        status_tag: 'OPEN TO WORK & FREELANCE',
+        name: 'Santiago Velázquez',
+        role: 'Backend & Solution Architect',
+        location: 'Netherlands / Países Bajos',
+        arch_label: 'Architecture',
+        arch_value: 'DDD, CQRS & Event-Driven',
+        backend_label: 'Backend Stack',
+        backend_value: 'Laravel 11 & PHP 8.4',
+        containers_label: 'Containers',
+        containers_value: 'Docker Monorepo',
+        frontend_label: 'Frontend',
+        frontend_value: 'Vue 3 & TypeScript',
+        summary: 'Specialized in designing high-performance APIs, isolating domain logic (DDD/CQRS), orchestrating event-driven architectures (Event-Driven), and optimizing PostgreSQL databases with Redis caches.'
+      },
+
       // Experience
       experience_title: 'Technical Career',
       experience_subtitle: 'Hands-on experience building and integrating structured data flows.',
@@ -228,12 +266,12 @@ const translations: Record<Locale, Record<string, any>> = {
       timeline_role: 'Backend Developer Intern',
       timeline_company: 'at',
       timeline_desc: 'During this one-year internship, I developed and consolidated a major part of my technical backend skills. I actively participated in implementing backend architecture applying Domain-Driven Design (DDD) and CQRS principles to ensure highly maintainable code. I also collaborated on the design and development of a Secure REST API and SaaS Payment Gateway integrated with the Stripe API with concurrency control and rate-limiting. I contributed to creating Command/Query Handlers, propagating domain Events, designing independent DTOs, and decoupling Repositories. I ensured code quality through unit testing with PHPUnit and API validation with Postman.',
-      
+
       // Projects
       projects_label: 'SYSTEMS PORTFOLIO',
       projects_title: 'Featured Projects',
       projects_subtitle: 'Distributed systems and backend infrastructures I have conceptualized and structured.',
-      
+
       project_santi_solutions: {
         title: 'Santi Solutions',
         desc: 'Premium home remodeling and consulting platform for Florida, USA. Designed under Hexagonal Architecture and DDD (Domain-Driven Design). Orchestrated with a 12-container Docker monorepo, including 6 Laravel 11/PHP 8.4 web services, 5 asynchronous workers for event-driven communication via Redis Pub/Sub, and a pool of 6 isolated PostgreSQL databases.',
@@ -288,7 +326,7 @@ const translations: Record<Locale, Record<string, any>> = {
       channel: 'Main Channel',
       phone: 'Mobile / WhatsApp',
       location: 'Location',
-      location_text: 'Madrid, Spain (Available for remote work)',
+      location_text: 'Netherlands / Países Bajos',
       form_title: 'SECURE_API_FORM.JSON',
       form_name: 'Your Name',
       form_email: 'Your Email Address',
@@ -321,7 +359,7 @@ const translations: Record<Locale, Record<string, any>> = {
       inbox_select_prompt: 'Select a message from the inbox to audit its content.',
       confirm_delete_post: 'Are you sure you want to delete this technical publication?',
       confirm_delete_msg: 'Do you want to delete this message from the inbox?',
-      
+
       // Modal Post
       modal_post_new: 'Create Technical Publication',
       modal_post_edit: 'Edit Technical Publication',
@@ -343,7 +381,7 @@ export function useI18n() {
   const t = (key: string): string => {
     const keys = key.split('.');
     let value: any = translations[locale.value];
-    
+
     for (const k of keys) {
       if (value && typeof value === 'object' && k in value) {
         value = value[k];
@@ -361,7 +399,7 @@ export function useI18n() {
         return fallback !== undefined ? fallback : key;
       }
     }
-    
+
     return typeof value === 'string' ? value : key;
   };
 

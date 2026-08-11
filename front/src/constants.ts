@@ -3,99 +3,94 @@ import { Post, Message, Certification, Project } from './types';
 export const DEFAULT_POSTS: Post[] = [
   {
     id: '1',
-    title: 'Desacoplando la Lógica de Negocio con DDD en Symfony 7',
-    title_en: 'Decoupling Business Logic with DDD in Symfony 7',
-    summary: 'Cómo estructurar el dominio utilizando Handlers, DTOs y Repositorios independientes para evitar el acoplamiento con Doctrine DBAL.',
-    summary_en: 'How to structure the domain using Handlers, DTOs, and independent Repositories to avoid coupling with Doctrine DBAL.',
-    content: `La arquitectura de software moderna exige que nuestras aplicaciones sean altamente mantenibles y escalables. En ecosistemas complejos, acoplar la lógica de negocio directamente al ORM (como Doctrine o Eloquent) suele ser el primer paso hacia el temido "código espagueti".
+    title: 'Tabamba: Arquitectura Backend con DDD, CQRS, Event-Driven y Audio Streaming',
+    title_en: 'Tabamba: Backend Architecture with DDD, CQRS, Event-Driven & Audio Streaming',
+    summary: 'Diseño y desarrollo del backend para Tabamba: plataforma de alto rendimiento para podcasters aplicando Domain-Driven Design (DDD), CQRS, arquitectura orientada a eventos y streaming de audio de baja latencia.',
+    summary_en: 'Design and engineering of Tabamba backend: a high-performance podcasting platform applying Domain-Driven Design (DDD), CQRS, event-driven architecture, and low-latency audio streaming.',
+    content: `En la industria del podcasting y distribución de contenidos de audio, la estabilidad de la API backend, el desacoplamiento de la lógica de negocio y la rapidez en la entrega del contenido determinan la experiencia del usuario.
 
-### Implementando DDD en Symfony
-Para resolver esto, recurrimos al **Domain-Driven Design (DDD)** táctico, estructurando nuestra aplicación en tres capas fundamentales:
+### Arquitectura de Tabamba (Back-Podcasters)
+Para dar soporte a la emisión y gestión de podcasts en **Tabamba**, diseñamos un servicio backend estructurado con principios de **Domain-Driven Design (DDD)**, **CQRS** (Command Query Responsibility Segregation) y **Event-Driven Architecture**:
 
-1. **Capa de Dominio (Domain):** Alberga las reglas de negocio puras. Aquí definimos nuestros Agregados, Entidades, Objetos de Valor (Value Objects) y contratos de Repositorios. Es 100% independiente de cualquier framework o base de datos.
-2. **Capa de Aplicación (Application):** Orquesta el flujo de datos. En esta capa implementamos el patrón **CQRS** (Command Query Responsibility Segregation). Los **Command Handlers** gestionan acciones de escritura, mientras que los **Query Handlers** resuelven la lectura de datos.
-3. **Capa de Infraestructura (Infrastructure):** Contiene la implementación concreta de los contratos. Aquí vive el mapeo de base de datos con Doctrine, el envío de emails, colas de mensajería, etc.
+1. **Capa de Dominio e Identidad:** Las reglas de negocio de episodios, canales RSS y cuotas de almacenamiento están totalmente aisladas del ORM.
+2. **Command & Query Handlers:** Los comandos alteran el estado del sistema mediante eventos de dominio, mientras las consultas de lectura leen proyecciones optimizadas.
+3. **Gestión Desacoplada de Audio & RSS:** Streaming de audio de baja latencia con fragmentación de medios y generación automatizada de feeds RSS validados.
+4. **Persistencia en PostgreSQL & Event Bus:** Modelo relacional con índices optimizados para metadatos de episodios y propagación asíncrona de eventos.
 
 \`\`\`php
-// Ejemplo de un Command Handler desacoplado
+// Ejemplo de Command Handler y controlador de streaming en Tabamba
 namespace App\\Application\\CommandHandler;
 
-use App\\Domain\\Repository\\UserRepositoryInterface;
-use App\\Application\\Command\\RegisterUserCommand;
-use App\\Domain\\Entity\\User;
+use App\\Domain\\Repository\\PodcastRepositoryInterface;
+use App\\Application\\Command\\PublishEpisodeCommand;
 
-class RegisterUserHandler
+class PublishEpisodeHandler
 {
     public function __construct(
-        private UserRepositoryInterface $userRepository
+        private readonly PodcastRepositoryInterface $repository
     ) {}
 
-    public function __invoke(RegisterUserCommand $command): void
+    public function __invoke(PublishEpisodeCommand $command): void
     {
-        $user = User::create(
-            $command->getEmail(),
-            $command->getPassword()
-        );
-        
-        $this->userRepository->save($user);
+        $episode = $this->repository->findOrFail($command->getEpisodeId());
+        $episode->publish();
+        $this->repository->save($episode);
     }
 }
 \`\`\`
 
-### Beneficios del Desacoplamiento
-- **Testabilidad:** Los tests unitarios no requieren levantar bases de datos; testeamos el dominio con mocks puros.
-- **Mantenibilidad:** Cambiar la base de datos (por ejemplo, de MySQL a PostgreSQL) solo afecta a la capa de Infraestructura, el Dominio permanece intacto.`,
-    content_en: `Modern software engineering demands that our applications be highly maintainable and scalable. In complex ecosystems, coupling business logic directly to the ORM (like Doctrine or Eloquent) is usually the first step toward the dreaded "spaghetti code."
+### Repositorio y Código Fuente
+El código fuente completo de la arquitectura backend de Tabamba está alojado en GitHub:
+https://github.com/SantiDev-Soc/Back-Podcasters.git`,
+    content_en: `In the podcasting and audio distribution industry, backend API stability, domain logic decoupling, and rapid content delivery determine the user experience.
 
-### Implementing DDD in Symfony
-To solve this, we turn to tactical **Domain-Driven Design (DDD)**, structuring our application into three fundamental layers:
+### Tabamba Architecture (Back-Podcasters)
+To support podcast streaming and management in **Tabamba**, we engineered a backend service built around **Domain-Driven Design (DDD)**, **CQRS**, and **Event-Driven Architecture**:
 
-1. **Domain Layer:** Houses pure business rules. Here we define our Aggregates, Entities, Value Objects, and Repository contracts. It is 100% independent of any framework or database.
-2. **Application Layer:** Orchestrates the data flow. In this layer, we implement the **CQRS** (Command Query Responsibility Segregation) pattern. **Command Handlers** manage write actions, while **Query Handlers** handle reading data.
-3. **Infrastructure Layer:** Contains the concrete implementation of the contracts. Here live the database mapping with Doctrine, email sending, message queues, etc.
+1. **Domain & Identity Layer:** Business rules for episodes, RSS channels, and quota limits are completely isolated from the ORM.
+2. **Command & Query Handlers:** Commands mutate system state via domain events, while queries read optimized projections.
+3. **Decoupled Audio & RSS Management:** Low-latency audio streaming with media chunking and automated RSS feed validation.
+4. **PostgreSQL Persistence & Event Bus:** Relational schema with optimized indexes for episode metadata and asynchronous event propagation.
 
 \`\`\`php
-// Example of a decoupled Command Handler
+// Example Command Handler and streaming controller in Tabamba
 namespace App\\Application\\CommandHandler;
 
-use App\\Domain\\Repository\\UserRepositoryInterface;
-use App\\Application\\Command\\RegisterUserCommand;
-use App\\Domain\\Entity\\User;
+use App\\Domain\\Repository\\PodcastRepositoryInterface;
+use App\\Application\\Command\\PublishEpisodeCommand;
 
-class RegisterUserHandler
+class PublishEpisodeHandler
 {
     public function __construct(
-        private UserRepositoryInterface $userRepository
+        private readonly PodcastRepositoryInterface $repository
     ) {}
 
-    public function __invoke(RegisterUserCommand $command): void
+    public function __invoke(PublishEpisodeCommand $command): void
     {
-        $user = User::create(
-            $command->getEmail(),
-            $command->getPassword()
-        );
-        
-        $this->userRepository->save($user);
+        $episode = $this->repository->findOrFail($command->getEpisodeId());
+        $episode->publish();
+        $this->repository->save($episode);
     }
 }
 \`\`\`
 
-### Benefits of Decoupling
-- **Testability:** Unit tests do not require starting databases; we test the domain with pure mocks.
-- **Maintainability:** Changing the database (e.g., from MySQL to PostgreSQL) only affects the Infrastructure layer; the Domain remains intact.`,
-    category: 'Arquitectura',
-    category_en: 'Architecture',
-    readTime: '6 min lectura',
-    readTime_en: '6 min read',
-    date: '2026-06-15',
-    tags: ['PHP', 'Symfony', 'DDD', 'CQRS']
+### Repository & Source Code
+The complete source code for Tabamba's backend architecture is hosted on GitHub:
+https://github.com/SantiDev-Soc/Back-Podcasters.git`,
+    category: 'Arquitectura & Audio',
+    category_en: 'Architecture & Audio',
+    readTime: '7 min lectura',
+    readTime_en: '7 min read',
+    date: '2026-08-01',
+    tags: ['Tabamba', 'DDD', 'CQRS', 'Event-Driven', 'PHP', 'Laravel', 'PostgreSQL'],
+    github_url: 'https://github.com/SantiDev-Soc/Back-Podcasters.git'
   },
   {
     id: '2',
-    title: 'Arquitectura de Mensajería Distribuida con Laravel Reverb y Redis',
-    title_en: 'Distributed Messaging Architecture with Laravel Reverb and Redis',
-    summary: 'Diseño y optimización de un sistema de mensajería en tiempo real utilizando Laravel Reverb, colas distribuidas y aislamiento de base de datos.',
-    summary_en: 'Designing and optimizing a real-time messaging system using Laravel Reverb, distributed queues, and database isolation.',
+    title: 'Arquitectura de Mensajería Distribuida en MyChat con Laravel Reverb y Redis',
+    title_en: 'Distributed Messaging Architecture in MyChat with Laravel Reverb and Redis',
+    summary: 'Diseño y optimización del sistema de mensajería en tiempo real MyChat utilizando Laravel Reverb, colas distribuidas y aislamiento de base de datos.',
+    summary_en: 'Designing and optimizing the MyChat real-time messaging system using Laravel Reverb, distributed queues, and database isolation.',
     content: `El tiempo real ya no es un lujo; es una expectativa del usuario. Sin embargo, escalar conexiones WebSockets a miles de usuarios simultáneos plantea un desafío de rendimiento considerable.
 
 ### El Rol de Laravel Reverb y Redis
@@ -163,18 +158,19 @@ This distributed architecture allowed us to reduce message delivery latency to u
     readTime: '8 min lectura',
     readTime_en: '8 min read',
     date: '2026-05-28',
-    tags: ['Laravel', 'Redis', 'PostgreSQL', 'WebSockets']
+    tags: ['MyChat', 'Laravel', 'Redis', 'PostgreSQL', 'WebSockets'],
+    github_url: 'https://github.com/SantiDev-Soc/Mmy-Chat-Microservices-Architecture.git'
   },
   {
-    id: '3',
-    title: 'Orquestación de Microservicios Backend con Docker y Nginx',
-    title_en: 'Backend Microservices Orchestration with Docker and Nginx',
-    summary: 'Guía práctica para construir un entorno de desarrollo idéntico a producción usando contenedores Docker aislados y Nginx como API Gateway.',
-    summary_en: 'Practical guide to building a development environment identical to production using isolated Docker containers and Nginx as an API Gateway.',
+    id: '4',
+    title: 'Orquestación de Microservicios Backend en Santi Solutions con Docker y Nginx',
+    title_en: 'Backend Microservices Orchestration in Santi Solutions with Docker and Nginx',
+    summary: 'Guía práctica para construir el entorno monorepo Docker de Santi Solutions con contenedores aislados y Nginx como API Gateway.',
+    summary_en: 'Practical guide to building Santi Solutions monorepo Docker environment with isolated containers and Nginx as an API Gateway.',
     content: `El clásico "en mi máquina funciona" es el enemigo número uno de la entrega continua. Docker y la contenerización resuelven esto al empaquetar de forma exacta el sistema operativo, dependencias y variables de entorno de cada servicio.
 
-### Diseñando la Topología de Red
-Para una arquitectura robusta, cada microservicio debe estar aislado de los demás en la capa de red:
+### Diseñando la Topología de Red de Santi Solutions
+Para una arquitectura robusta en Santi Solutions, cada microservicio debe estar aislado de los demás en la capa de red:
 1. **Red Externa (Frontend Network):** Expone solo el contenedor Nginx al mundo exterior.
 2. **Red Interna (Backend Network):** Permite que los microservicios se comuniquen entre sí y con sus respectivas bases de datos, manteniéndolas inaccesibles de forma externa.
 
@@ -185,7 +181,7 @@ Nginx actúa como la puerta de entrada única (API Gateway), redirigiendo el tr�
 # Fragmento de configuración de Nginx como Gateway
 server {
     listen 80;
-    server_name api.santiago.dev;
+    server_name api.santisolutions.com;
 
     location /api/v1/users {
         proxy_pass http://user_service:8000;
@@ -203,8 +199,8 @@ server {
 Mediante un archivo \`docker-compose.yml\` bien estructurado, levantamos el stack completo (Nginx, PHP-FPM, PostgreSQL, Redis) en un único comando, facilitando la incorporación de nuevos desarrolladores al equipo instantáneamente.`,
     content_en: `The classic "it works on my machine" is continuous delivery's number one enemy. Docker and containerization solve this by packaging exactly the operating system, dependencies, and environment variables of each service.
 
-### Designing the Network Topology
-For a robust architecture, each microservice must be isolated from others at the network layer:
+### Designing the Network Topology of Santi Solutions
+For a robust architecture in Santi Solutions, each microservice must be isolated from others at the network layer:
 1. **External Network (Frontend Network):** Exposes only the Nginx container to the outside world.
 2. **Internal Network (Backend Network):** Allows microservices to communicate with each other and with their respective databases, keeping them inaccessible from the outside.
 
@@ -215,7 +211,7 @@ Nginx acts as the single entry point (API Gateway), redirecting incoming traffic
 # Nginx Gateway configuration snippet
 server {
     listen 80;
-    server_name api.santiago.dev;
+    server_name api.santisolutions.com;
 
     location /api/v1/users {
         proxy_pass http://user_service:8000;
@@ -236,7 +232,82 @@ Through a well-structured \`docker-compose.yml\` file, we spin up the full stack
     readTime: '5 min lectura',
     readTime_en: '5 min read',
     date: '2026-04-12',
-    tags: ['Docker', 'Nginx', 'DevOps', 'Microservicios']
+    tags: ['SantiSolutions', 'Docker', 'Nginx', 'DevOps', 'Microservicios'],
+    github_url: 'https://github.com/SantiDev-Soc/Santi-Solutions.git'
+  },
+  {
+    id: '4',
+    title: 'Construyendo un Portafolio Full-Stack Seguro con Vue 3, TypeScript y API REST',
+    title_en: 'Building a Secure Full-Stack Portfolio with Vue 3, TypeScript and REST API',
+    summary: 'Diseño e ingeniería de este portafolio profesional: arquitectura modular en Vue 3, monitorización HTTP en tiempo real, integración REST API y despliegue en contenedor.',
+    summary_en: 'Engineering and design of this professional portfolio: modular Vue 3 architecture, real-time HTTP monitoring, REST API integration, and containerized deployment.',
+    content: `Un portafolio profesional de ingeniería de software debe ser una demostración viva de buenas prácticas de código, seguridad y arquitectura. En este artículo explico cómo diseñé e implementé la aplicación que estás navegando actualmente.
+
+### 1. Arquitectura Frontend Modular con Vue 3 y TypeScript
+El frontend está desarrollado en **Vue 3 (Composition API)** con TypeScript para garantizar estricto tipado estático:
+- **Separación de responsabilidades:** Componentes limpios en \`src/components/sections/\` y modales de gestión desacoplados.
+- **Composables de API (\`useApi\` y \`monitoredFetch\`):** Abstracciones reactivas para canalizar peticiones HTTP.
+- **Sincronización Inteligente:** Fallback de datos iniciales en memoria cuando la API externa no está conectada y mapeo automático cuando la base de datos responde.
+
+### 2. Monitorización de Tráfico HTTP en Tiempo Real (\`API_TRAFFIC_MONITOR.LOG\`)
+Para brindar visibilidad transparente sobre la comunicación cliente-servidor:
+- Toda petición entrante/saliente atraviesa el wrapper \`monitoredFetch\`.
+- Captura la URL objetivo, verbo HTTP, tiempo de respuesta (ms) y estado (200 OK, 404 Not Found, etc.).
+- Muestra una consola interactiva en el Dashboard para auditar la actividad de la API en tiempo real.
+
+\`\`\`typescript
+// Fragmento del interceptor de tráfico HTTP
+export const monitoredFetch = async (url: string, options: RequestInit = {}): Promise<Response> => {
+  const startTime = performance.now();
+  recordRequest(method, url, payload);
+  const response = await fetch(url, options);
+  const duration = Math.round(performance.now() - startTime);
+  updateRequestLog(id, response.status, duration);
+  return response;
+};
+\`\`\`
+
+### 3. Seguridad y Integración RESTful
+- **Cero claves expuestas:** Headers de autenticación protegidos mediante Bearer tokens.
+- **Resiliencia de Rutas:** Reintentos inteligentes entre convenciones plurales y singulares de Laravel (\`/contacts/create\`, \`/messages/create\`).
+- **Persistencia en Base de Datos:** Eliminación de almacenamiento local volátil para garantizar que la información leída en el dashboard provenga de la base de datos real.`,
+    content_en: `A professional software engineering portfolio should be a living demonstration of code quality, security, and architecture. In this article I explain how I designed and implemented the current application you are browsing.
+
+### 1. Modular Frontend Architecture with Vue 3 & TypeScript
+The frontend is built with **Vue 3 (Composition API)** and TypeScript for strict static typing:
+- **Separation of concerns:** Clean components inside \`src/components/sections/\` and decoupled management modals.
+- **API Composables (\`useApi\` and \`monitoredFetch\`):** Reactive abstractions to pipe HTTP requests.
+- **Smart Synchronization:** Initial memory fallback data when the external API is offline, auto-mapping live responses once the database connects.
+
+### 2. Real-Time HTTP Traffic Monitor (\`API_TRAFFIC_MONITOR.LOG\`)
+To provide full visibility into client-server communication:
+- Every request passes through the \`monitoredFetch\` wrapper.
+- Captures target URL, HTTP verb, response latency (ms), and status code (200 OK, 404 Not Found, etc.).
+- Displays an interactive terminal on the Dashboard to audit live API traffic.
+
+\`\`\`typescript
+// HTTP Traffic interceptor snippet
+export const monitoredFetch = async (url: string, options: RequestInit = {}): Promise<Response> => {
+  const startTime = performance.now();
+  recordRequest(method, url, payload);
+  const response = await fetch(url, options);
+  const duration = Math.round(performance.now() - startTime);
+  updateRequestLog(id, response.status, duration);
+  return response;
+};
+\`\`\`
+
+### 3. Security and RESTful Integration
+- **Zero exposed keys:** Protected authentication headers using Bearer tokens.
+- **Route Resilience:** Smart fallbacks across Laravel plural and singular route conventions (\`/contacts/create\`, \`/messages/create\`).
+- **Database Persistence:** Elimination of volatile local storage to ensure dashboard data comes exclusively from the real database.`,
+    category: 'Full-Stack',
+    category_en: 'Full-Stack',
+    readTime: '7 min lectura',
+    readTime_en: '7 min read',
+    date: '2026-07-26',
+    tags: ['Portfolio', 'Vue 3', 'TypeScript', 'Laravel', 'REST API', 'Docker'],
+    github_url: 'https://github.com/SantiDev-Soc/Vue_Laravel_portfolio.git'
   }
 ];
 
@@ -297,24 +368,41 @@ export const DEFAULT_PROJECTS: Project[] = [
     link_label: 'ENLACE PROYECTO:',
     link_label_en: 'PROJECT LINK:',
     link_url: 'https://santisolutions.com',
+    github_url: 'https://github.com/SantiDev-Soc/Santi-Solutions.git',
     category: 'Globe'
   },
   {
     id: '2',
-    title: 'Sistema de Mensajería Distribuida en Tiempo Real',
-    title_en: 'Distributed Real-Time Messaging System',
-    description: 'Despliegue de un sistema escalable de WebSockets utilizando Laravel Reverb, colas de trabajo distribuidas y caché de baja latencia mediante Redis. Implementación de bases de datos aisladas para comunicación inmediata, robusta y tolerante a fallos.',
-    description_en: 'Deployment of a scalable WebSocket system using Laravel Reverb, distributed queues, and low-latency cache via Redis. Implementation of isolated databases for immediate, robust, and fault-tolerant communication.',
+    title: 'Tabamba - Podcasting & Audio Streaming Backend (DDD, CQRS & Event-Driven)',
+    title_en: 'Tabamba - Podcasting & Audio Streaming Backend (DDD, CQRS & Event-Driven)',
+    description: 'Plataforma y arquitectura backend para podcasters y creadores de audio. Desarrollada en Symfony 7 / Laravel 11 y PHP 8.4 bajo principios de DDD (Domain-Driven Design), CQRS y Event-Driven Architecture para gestión desacoplada de dominios, handlers de comandos/consultas, normalización de feeds RSS y streaming de audio de baja latencia.',
+    description_en: 'Backend architecture and platform for podcasters and audio creators. Built in Symfony 7 / Laravel 11 and PHP 8.4 applying DDD (Domain-Driven Design), CQRS, and Event-Driven Architecture for decoupled domain logic, command/query handlers, RSS feed normalization, and low-latency audio streaming.',
     status: 'ESTADO: PRODUCCIÓN',
     status_en: 'STATUS: PRODUCTION',
-    technologies: ['Laravel 11', 'Docker', 'Redis', 'PostgreSQL'],
-    link_label: 'SISTEMA DE MENSAJERÍA:',
-    link_label_en: 'MESSAGING SYSTEM:',
-    link_url: 'https://mychat.com',
+    technologies: ['Laravel 11 / Symfony', 'PHP 8.4', 'DDD & CQRS', 'Event-Driven', 'Audio Streaming', 'PostgreSQL', 'Docker'],
+    link_label: 'VER REPOSITORIO TABAMBA:',
+    link_label_en: 'VIEW TABAMBA REPO:',
+    link_url: 'https://github.com/SantiDev-Soc/Back-Podcasters.git',
+    github_url: 'https://github.com/SantiDev-Soc/Back-Podcasters.git',
     category: 'Layers'
   },
   {
     id: '3',
+    title: 'MyChat - Sistema de Mensajería Distribuida en Tiempo Real',
+    title_en: 'MyChat - Distributed Real-Time Messaging System',
+    description: 'Despliegue de un sistema escalable de WebSockets utilizando Laravel Reverb, colas de trabajo distribuidas y caché de baja latencia mediante Redis. Implementación de bases de datos aisladas para comunicación inmediata, robusta y tolerante a fallos.',
+    description_en: 'Deployment of a scalable WebSocket system using Laravel Reverb, distributed queues, and low-latency cache via Redis. Implementation of isolated databases for immediate, robust, and fault-tolerant communication.',
+    status: 'ESTADO: PRODUCCIÓN',
+    status_en: 'STATUS: PRODUCTION',
+    technologies: ['Laravel 11', 'Docker', 'Redis', 'PostgreSQL', 'Laravel Reverb'],
+    link_label: 'SISTEMA DE MENSAJERÍA:',
+    link_label_en: 'MESSAGING SYSTEM:',
+    link_url: 'https://github.com/SantiDev-Soc/Mmy-Chat-Microservices-Architecture.git',
+    github_url: 'https://github.com/SantiDev-Soc/Mmy-Chat-Microservices-Architecture.git',
+    category: 'Layers'
+  },
+  {
+    id: '4',
     title: 'Motor de Portafolio Seguro & Pipeline Full-Stack',
     title_en: 'Secure Portfolio Engine & Full-Stack Pipeline',
     description: 'Sistema modular interactivo desarrollado en Vue 3 y TypeScript, dockerizado bajo un entorno Alpine seguro y preparado para enlazarse con una API backend de Laravel para persistencia duradera y respuestas de email automáticas.',
@@ -322,9 +410,10 @@ export const DEFAULT_PROJECTS: Project[] = [
     status: 'ESTADO: INTEGRACIÓN',
     status_en: 'STATUS: INTEGRATION',
     technologies: ['Vue 3', 'Docker', 'TypeScript', 'Laravel Connect'],
-    link_label: 'ENLACE PROYECTO:',
-    link_label_en: 'PROJECT LINK:',
-    link_url: '',
+    link_label: 'VER REPOSITORIO PORTAFOLIO:',
+    link_label_en: 'VIEW PORTFOLIO REPO:',
+    link_url: 'https://github.com/SantiDev-Soc/Vue_Laravel_portfolio.git',
+    github_url: 'https://github.com/SantiDev-Soc/Vue_Laravel_portfolio.git',
     category: 'Terminal'
   }
 ];

@@ -12,6 +12,7 @@ export interface Post {
   readTime_en?: string;
   date: string;
   tags: string[];
+  github_url?: string;
 }
 
 export interface Message {
@@ -48,6 +49,7 @@ export interface Project {
   link_label?: string;
   link_label_en?: string;
   link_url?: string;
-  category?: 'Globe' | 'Layers' | 'Terminal';
+  github_url?: string;
+  category?: 'Globe' | 'Layers' | 'Terminal' | 'Code';
 }
 

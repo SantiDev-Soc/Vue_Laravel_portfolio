@@ -43,7 +43,7 @@ const { t } = useI18n();
           </div>
           <div>
             <h4 class="font-bold text-white text-xs font-mono uppercase">{{ t('contact.phone') }}</h4>
-            <a href="tel:+34691318563" class="text-sm text-slate-300 hover:text-emerald-400 transition-colors">+34 691 31 85 63</a>
+            <a href="tel:+31644708530" class="text-sm text-slate-300 hover:text-emerald-400 transition-colors">+31 644 70 85 30</a>
           </div>
         </div>
 
@@ -60,9 +60,9 @@ const { t } = useI18n();
 
       <!-- Formulario Seguro (Extracto modular en forms/ContactForm.vue) -->
       <div class="lg:col-span-8">
-        <ContactForm 
-          @message-sent="$emit('message-sent', $event)" 
-          @navigate="$emit('navigate', $event)" 
+        <ContactForm
+            @message-sent="$emit('message-sent', $event)"
+            @navigate="$emit('navigate', $event)"
         />
       </div>
     </div>

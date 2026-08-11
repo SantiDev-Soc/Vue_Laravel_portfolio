@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { 
-  Terminal, 
-  BookOpen, 
-  Calendar, 
-  X, 
-  ChevronRight 
+import {
+  Terminal,
+  BookOpen,
+  Calendar,
+  X,
+  ChevronRight,
+  Github
 } from 'lucide-vue-next';
 import { Post } from '../../types';
 import { useI18n } from '../../composables/useI18n';
@@ -62,13 +63,13 @@ const filteredPosts = computed(() => {
     <div class="space-y-8">
       <!-- Filtros Rápidos (Categorías) -->
       <div id="categories-filter-bar" class="flex flex-wrap gap-2">
-        <button 
-          v-for="cat in categories" 
-          :key="cat"
-          :id="'filter-btn-' + cat.toLowerCase().replace(/\s+/g, '-')"
-          @click="selectedCategoryFilter = cat"
-          :class="[selectedCategoryFilter === cat ? 'bg-emerald-500 text-black font-semibold' : 'bg-[#14171C] text-[#94A3B8] hover:text-white border border-white/5']"
-          class="px-3.5 py-1.5 rounded-lg text-xs font-mono transition-all"
+        <button
+            v-for="cat in categories"
+            :key="cat"
+            :id="'filter-btn-' + cat.toLowerCase().replace(/\s+/g, '-')"
+            @click="selectedCategoryFilter = cat"
+            :class="[selectedCategoryFilter === cat ? 'bg-emerald-500 text-black font-semibold' : 'bg-[#14171C] text-[#94A3B8] hover:text-white border border-white/5']"
+            class="px-3.5 py-1.5 rounded-lg text-xs font-mono transition-all"
         >
           {{ cat === '__ALL__' ? t('blog.filter_all') : (locale === 'en' ? (props.posts.find(p => p.category === cat)?.category_en || cat) : cat) }}
         </button>
@@ -76,39 +77,52 @@ const filteredPosts = computed(() => {
 
       <!-- Grid de Publicaciones -->
       <div v-if="filteredPosts.length > 0" id="posts-grid-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <article 
-          v-for="post in filteredPosts" 
-          :key="post.id"
-          :id="'post-card-' + post.id"
-          class="bg-[#14171C] border border-white/5 hover:border-emerald-500/20 rounded-xl p-6 transition-all cursor-pointer space-y-4 flex flex-col justify-between group"
-          @click="selectedPost = post"
+        <article
+            v-for="post in filteredPosts"
+            :key="post.id"
+            :id="'post-card-' + post.id"
+            class="bg-[#14171C] border border-white/5 hover:border-emerald-500/20 rounded-xl p-6 transition-all cursor-pointer space-y-4 flex flex-col justify-between group"
+            @click="selectedPost = post"
         >
           <div class="space-y-2">
             <div class="flex items-center justify-between text-xs text-slate-500 font-mono">
               <span>{{ locale === 'en' && post.category_en ? post.category_en : post.category }}</span>
               <span>{{ locale === 'en' && post.readTime_en ? post.readTime_en : (post.readTime + ' ' + t('blog.read_time_label')) }}</span>
             </div>
-            
+
             <h3 class="text-xl font-bold text-white group-hover:text-emerald-300 transition-colors">
-               {{ locale === 'en' && post.title_en ? post.title_en : post.title }}
+              {{ locale === 'en' && post.title_en ? post.title_en : post.title }}
             </h3>
-            
+
             <p class="text-sm text-[#94A3B8] leading-relaxed line-clamp-2">
               {{ locale === 'en' && post.summary_en ? post.summary_en : post.summary }}
             </p>
           </div>
 
           <div class="flex items-center justify-between pt-4 border-t border-white/5">
-            <div class="flex flex-wrap gap-1.5">
-              <span 
-                v-for="tag in post.tags" 
-                :key="tag"
-                class="px-2 py-0.5 bg-[#1A1E26] text-slate-300 rounded text-[10px] font-mono border border-white/5"
+            <div class="flex flex-wrap gap-1.5 max-w-[75%]">
+              <span
+                  v-for="tag in post.tags"
+                  :key="tag"
+                  class="px-2 py-0.5 bg-[#1A1E26] text-slate-300 rounded text-[10px] font-mono border border-white/5"
               >
                 #{{ tag }}
               </span>
             </div>
-            <ChevronRight class="h-4 w-4 text-emerald-400 group-hover:translate-x-1 transition-transform" />
+            <div class="flex items-center space-x-2">
+              <a
+                  v-if="post.github_url"
+                  :href="post.github_url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  @click.stop
+                  title="Ver código en GitHub"
+                  class="p-1.5 rounded-lg bg-[#1A1E26] hover:bg-emerald-500/20 text-slate-400 hover:text-emerald-400 border border-white/5 hover:border-emerald-500/30 transition-all flex items-center justify-center"
+              >
+                <Github class="h-4 w-4" />
+              </a>
+              <ChevronRight class="h-4 w-4 text-emerald-400 group-hover:translate-x-1 transition-transform" />
+            </div>
           </div>
         </article>
       </div>
@@ -125,9 +139,21 @@ const filteredPosts = computed(() => {
         <!-- Header Sticky del modal -->
         <div class="sticky top-0 bg-[#14171C]/95 backdrop-blur-md px-6 py-4 border-b border-white/5 flex items-center justify-between">
           <span class="text-xs font-mono text-emerald-400 uppercase font-bold">{{ locale === 'en' && selectedPost.category_en ? selectedPost.category_en : selectedPost.category }}</span>
-          <button @click="selectedPost = null" class="p-1 rounded bg-[#1A1E26] text-slate-400 hover:text-white transition-colors">
-            <X class="h-5 w-5" />
-          </button>
+          <div class="flex items-center space-x-2">
+            <a
+                v-if="selectedPost.github_url"
+                :href="selectedPost.github_url"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="flex items-center space-x-1.5 px-3 py-1 rounded bg-[#1A1E26] hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-mono transition-all"
+            >
+              <Github class="h-3.5 w-3.5" />
+              <span>GitHub</span>
+            </a>
+            <button @click="selectedPost = null" class="p-1 rounded bg-[#1A1E26] text-slate-400 hover:text-white transition-colors">
+              <X class="h-5 w-5" />
+            </button>
+          </div>
         </div>
 
         <!-- Contenido del modal -->
