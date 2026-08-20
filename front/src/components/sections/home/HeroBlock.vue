@@ -94,7 +94,7 @@ const { t } = useI18n();
             <div class="relative group shrink-0">
               <div class="absolute -inset-1 rounded-2xl bg-gradient-to-r from-emerald-500 to-indigo-500 opacity-50 blur group-hover:opacity-80 transition-opacity"></div>
               <img
-                  src="/assets/santiago.svg"
+                  src="../../../assets/img/santi.jpeg"
                   alt="Santiago Velázquez"
                   referrerPolicy="no-referrer"
                   class="relative h-24 w-24 rounded-2xl object-cover border-2 border-emerald-400/60 bg-[#0A0C10] shadow-xl group-hover:scale-105 transition-transform"
