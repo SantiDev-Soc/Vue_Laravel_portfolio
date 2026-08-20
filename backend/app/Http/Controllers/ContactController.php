@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendNotificationMessageJob;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -27,6 +28,8 @@ class ContactController extends Controller
         $contact->subject = $request->input('subject');
         $contact->message = $request->input('message');
         $contact->save();
+
+        dispatch(new SendNotificationMessageJob($contact));
 
         return response()->json(['message' => 'Contact form submitted successfully.'], 201);
     }
